@@ -10,4 +10,6 @@ urlpatterns = [
     path(route='login', view=views.login_user, name='login'),
     # logout API endpoint (GET)
     path(route='logout', view=views.logout_user, name='logout'),
+    # register API endpoint (POST)
+    path(route='register', view=views.register_user, name='register'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
