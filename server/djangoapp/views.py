@@ -1,4 +1,3 @@
-# Required imports
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
@@ -6,16 +5,18 @@ from django.views.decorators.csrf import csrf_exempt
 import logging
 import json
 
-# Get an instance of a logger
+# NEW: models & populate import for get_cars
+from .models import CarMake, CarModel
+from .populate import initiate
+
 logger = logging.getLogger(__name__)
 
-# Handle login requests from the React frontend
 @csrf_exempt
 def login_user(request):
     """
-    Expects JSON body: {"userName": "...", "password": "..."}
-    On success: {"userName": "<name>", "status": "Authenticated"}
-    On failure: {"userName": "<name>"} (frontend handles failed state)
+    POST /djangoapp/login
+    Body: {"userName":"...", "password":"..."}
+    On success: {"userName":"<name>", "status":"Authenticated"}
     """
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -37,49 +38,42 @@ def login_user(request):
         logger.exception("Unexpected error during login")
         return JsonResponse({"error": "Unexpected error"}, status=500)
 
-# Handle logout requests
 def logout_user(request):
     """
     GET /djangoapp/logout
-    Returns: {"userName": ""} after session termination
+    Returns {"userName": ""} after session termination.
     """
-    logout(request)  # Terminate user session
-    data = {"userName": ""}  # Return empty username
-    return JsonResponse(data)
+    logout(request)
+    return JsonResponse({"userName": ""})
 
-# Handle user registration requests
 @csrf_exempt
 def register_user(request):
     """
     POST /djangoapp/register
-    Expects JSON body:
-      {
-        "userName": "...",
-        "password": "...",
-        "firstName": "...",
-        "lastName": "...",
-        "email": "..."
-      }
-    Behavior:
-      - If username exists -> {"error": "Already Registered"}
-      - Else create user, log them in -> {"userName": "<name>", "status": "Authenticated"}
+    Body: {
+      "userName": "...",
+      "password": "...",
+      "firstName": "...",
+      "lastName": "...",
+      "email": "..."
+    }
+    - If user exists: {"error": "Already Registered"}
+    - Else create, login, return {"userName":"<name>", "status":"Authenticated"}
     """
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
     try:
         data = json.loads(request.body or "{}")
-        username = data.get("userName", "").strip()
-        password = data.get("password", "")
-        first_name = data.get("firstName", "").strip()
-        last_name = data.get("lastName", "").strip()
-        email = data.get("email", "").strip()
+        username = (data.get("userName") or "").strip()
+        password = data.get("password") or ""
+        first_name = (data.get("firstName") or "").strip()
+        last_name  = (data.get("lastName") or "").strip()
+        email      = (data.get("email") or "").strip()
 
-        # Already registered?
         if User.objects.filter(username=username).exists():
             return JsonResponse({"error": "Already Registered"})
 
-        # Create user
         user = User.objects.create_user(
             username=username,
             password=password,
@@ -87,11 +81,8 @@ def register_user(request):
             first_name=first_name,
             last_name=last_name,
         )
-
-        # Log them in
         login(request, user)
         return JsonResponse({"userName": username, "status": "Authenticated"})
-
     except json.JSONDecodeError:
         logger.exception("Invalid JSON in registration request")
         return JsonResponse({"error": "Invalid JSON"}, status=400)
@@ -99,28 +90,28 @@ def register_user(request):
         logger.exception("Unexpected error during registration")
         return JsonResponse({"error": "Unexpected error"}, status=500)
 
-# Create a `logout_request` view to handle sign out request
-# def logout_request(request):
-# ...
+def get_cars(request):
+    """
+    GET /djangoapp/get_cars
+    If no CarMake/CarModel exist, populate once, then return:
+      {"CarModels": [{"CarModel": "<model>", "CarMake": "<make>"} ...]}
+    """
+    try:
+        count = CarMake.objects.count()
+        if count == 0:
+            initiate()
 
-# Create a `registration` view to handle sign up request
-# @csrf_exempt
-# def registration(request):
-# ...
+        # Our CarModel FK is named 'make' (not 'car_make'), so select_related('make')
+        car_models = CarModel.objects.select_related('make').all()
 
-# # Update the `get_dealerships` view to render the index page with
-# a list of dealerships
-# def get_dealerships(request):
-# ...
+        cars = []
+        for car_model in car_models:
+            cars.append({
+                "CarModel": car_model.name,
+                "CarMake":  car_model.make.name
+            })
 
-# Create a `get_dealer_reviews` view to render the reviews of a dealer
-# def get_dealer_reviews(request,dealer_id):
-# ...
-
-# Create a `get_dealer_details` view to render the dealer details
-# def get_dealer_details(request, dealer_id):
-# ...
-
-# Create a `add_review` view to submit a review
-# def add_review(request):
-# ...
+        return JsonResponse({"CarModels": cars})
+    except Exception as e:
+        logger.exception("Error in get_cars")
+        return JsonResponse({"error": "Failed to fetch cars"}, status=500)
