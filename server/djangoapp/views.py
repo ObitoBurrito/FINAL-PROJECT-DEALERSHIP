@@ -1,41 +1,49 @@
-# Uncomment the required imports before adding the code
-
-# from django.shortcuts import render
-# from django.http import HttpResponseRedirect, HttpResponse
-# from django.contrib.auth.models import User
-# from django.shortcuts import get_object_or_404, render, redirect
-# from django.contrib.auth import logout
-# from django.contrib import messages
-# from datetime import datetime
-
+# Required imports
 from django.http import JsonResponse
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
+from django.views.decorators.csrf import csrf_exempt
 import logging
 import json
-from django.views.decorators.csrf import csrf_exempt
-# from .populate import initiate
-
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-
-# Create your views here.
-
-# Create a `login_request` view to handle sign in request
+# Handle login requests from the React frontend
 @csrf_exempt
 def login_user(request):
-    # Get username and password from request.POST dictionary
-    data = json.loads(request.body)
-    username = data['userName']
-    password = data['password']
-    # Try to check if provide credential can be authenticated
-    user = authenticate(username=username, password=password)
-    data = {"userName": username}
-    if user is not None:
-        # If user is valid, call login method to login current user
-        login(request, user)
-        data = {"userName": username, "status": "Authenticated"}
+    """
+    Expects JSON body: {"userName": "...", "password": "..."}
+    On success: {"userName": "<name>", "status": "Authenticated"}
+    On failure: {"userName": "<name>"} (frontend handles failed state)
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    try:
+        data = json.loads(request.body or "{}")
+        username = data.get("userName", "")
+        password = data.get("password", "")
+        user = authenticate(username=username, password=password)
+        resp = {"userName": username}
+        if user is not None:
+            login(request, user)
+            resp["status"] = "Authenticated"
+        return JsonResponse(resp)
+    except json.JSONDecodeError:
+        logger.exception("Invalid JSON in login request")
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+    except Exception:
+        logger.exception("Unexpected error during login")
+        return JsonResponse({"error": "Unexpected error"}, status=500)
+
+# Handle logout requests
+def logout_user(request):
+    """
+    GET /djangoapp/logout
+    Returns: {"userName": ""} after session termination
+    """
+    logout(request)  # Terminate user session
+    data = {"userName": ""}  # Return empty username
     return JsonResponse(data)
 
 # Create a `logout_request` view to handle sign out request
