@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us • Best Cars Dealership</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .container-narrow { max-width: 960px; margin: 0 auto; padding: 0 1rem; }
+    .page-header { padding: 2rem 0 1rem; text-align: center; }
+    .page-header h1 { font-weight: 700; margin-bottom: .25rem; }
+    .lead { color: #555; }
+    .card { border-radius: 16px; border: 1px solid #e9ecef; }
+    .contact-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    @media (min-width: 768px) { .contact-grid { grid-template-columns: 1fr 1fr; } }
+    .badge { padding: .5rem .75rem; border-radius: 999px; background: #f2f4f7; }
+    .map-embed { width: 100%; height: 280px; border: 0; border-radius: 12px; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container-narrow d-flex align-items-center w-100">
+      <a class="navbar-brand fw-bold" href="/">Best Cars</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="navMain" class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about/">About Us</a></li>
+          <li class="nav-item"><a class="nav-link active fw-semibold" aria-current="page" href="/contact/">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="page-header container-narrow">
+    <h1>Contact Us</h1>
+    <p class="lead">We’re here to help with inventory questions, financing, trade-ins, and more.</p>
+  </header>
+
+  <main class="container-narrow">
+    <div class="contact-grid">
+      <section class="card p-4">
+        <h2 class="h4 mb-3">Showroom & Service</h2>
+        <p class="mb-2"><span class="badge">Address</span></p>
+        <p>1200 Elm Street, Suite 200<br>Halifax, NS B3J 2K9</p>
+        <p class="mb-2"><span class="badge">Phone</span></p>
+        <p>(902) 555-0149</p>
+        <p class="mb-2"><span class="badge">Email</span></p>
+        <p>sales@bestcars.example</p>
+        <p class="mb-2"><span class="badge">Hours</span></p>
+        <p class="mb-0">Mon–Sat: 9:00 AM – 6:00 PM<br>Sun: Closed</p>
+      </section>
+      <section class="card p-4">
+        <h2 class="h4 mb-3">Quick Message</h2>
+        <form>
+          <div class="mb-3">
+            <label class="form-label" for="name">Full Name</label>
+            <input class="form-control" id="name" type="text" placeholder="Naruto Uzamaki">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-control" id="email" type="email" placeholder="Naruto@Hokage.com">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="message">Message</label>
+            <textarea class="form-control" id="message" rows="4" placeholder="Tell us how you feel, believe it..."></textarea>
+          </div>
+          <button class="btn btn-primary" type="button" disabled>Send (demo)</button>
+        </form>
+      </section>
+    </div>
+    <section class="card p-4 mt-4">
+      <h2 class="h4 mb-3">Find Us</h2>
+      <iframe
+        class="map-embed"
+        src="https://maps.google.com/maps?q=Halifax%2C%20NS&t=&z=12&ie=UTF8&iwloc=&output=embed"
+        loading="lazy"
+        title="Map to Best Cars Halifax"
+      ></iframe>
+    </section>
+  </main>
+</body>
+</html>
