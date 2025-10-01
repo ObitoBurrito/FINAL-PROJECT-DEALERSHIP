@@ -9,6 +9,11 @@ backend_url = os.getenv('backend_url', default="http://localhost:3030")
 sentiment_analyzer_url = os.getenv('sentiment_analyzer_url', default="http://localhost:5050/")
 
 def get_request(endpoint, **kwargs):
+    """
+    Generic GET request helper.
+    endpoint: string (e.g. '/fetchDealers')
+    kwargs: query parameters (e.g. dealerId="15")
+    """
     params = ""
     if kwargs:
         pairs = []
@@ -37,15 +42,7 @@ def analyze_review_sentiments(text: str):
     Calls the Code Engine sentiment microservice at:
     <sentiment_analyzer_url>/analyze/<text>
     """
-    base = sentiment_analyzer_url
-    if not base.endswith("/"):
-        base = base + "/"
-
-    to_send = text
-    if " " in text and "%" not in text:
-        to_send = quote(text, safe="")
-
-    request_url = base + "analyze/" + to_send
+    request_url = sentiment_analyzer_url + "analyze/" + quote(text, safe="")
     print(f"Sentiment GET from {request_url}")
     try:
         response = requests.get(request_url, timeout=10)
