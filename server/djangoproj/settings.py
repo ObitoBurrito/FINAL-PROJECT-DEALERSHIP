@@ -41,14 +41,15 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'djangoproj.urls'
 
-# Templates: include static homepage and React build
+# Templates: allow Django to find:
+# - your static HTML (Home/About/Contact) in frontend/static
+# - React build's index.html in frontend/build
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'frontend/static'),
             os.path.join(BASE_DIR, 'frontend/build'),
-            os.path.join(BASE_DIR, 'frontend/build/static'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -86,11 +87,10 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
+# Static files: let Django collect static assets from both places
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'frontend/static'),
-    os.path.join(BASE_DIR, 'frontend/build'),
     os.path.join(BASE_DIR, 'frontend/build/static'),
 ]
 
