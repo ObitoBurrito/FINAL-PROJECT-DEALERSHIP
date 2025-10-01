@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 # Auth Views
 # ------------------------
 
+
 @csrf_exempt
 def login_user(request):
     """Authenticate and log in a user; returns JSON with status."""
@@ -41,6 +42,7 @@ def logout_user(request):
 # Cars (admin helper)
 # ------------------------
 
+
 def get_cars(request):
     count = CarMake.objects.count()
     if count == 0:
@@ -57,6 +59,7 @@ def get_cars(request):
 # ------------------------
 # Dealership API
 # ------------------------
+
 
 def get_dealerships(request, state="All"):
     if state == "All":
@@ -97,6 +100,7 @@ def get_dealer_reviews(request, dealer_id: int):
 # ------------------------
 # Add Review (POST)
 # ------------------------
+
 
 @csrf_exempt
 def add_review(request):
